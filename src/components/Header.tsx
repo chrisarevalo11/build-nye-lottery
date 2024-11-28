@@ -1,28 +1,43 @@
 "use client";
 
 import ConnectButton from "@/components/ConnectButton";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { METADATA } from "@/config";
+import { useGSAP } from "@gsap/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useAccount } from "wagmi";
+import gsap from "gsap";
 
-export function Header() {
-  const { isConnected } = useAccount();
+export default function Header() {
+  useGSAP(() => {
+    gsap.from(".header", {
+      y: "-200px",
+      duration: 1,
+      delay: 1.5,
+      ease: "power4.out",
+    });
+  }, []);
 
   return (
-    <header className="py-2 md:py-8">
+    <header
+      className="header fixed left-0 right-0 z-50 mx-auto mt-4 w-[90%] max-w-[600px] border-4 border-black bg-white"
+      style={{ boxShadow: "8px 6px 0px #000" }}
+    >
       <div className="mx-auto flex h-14 w-full max-w-[48.875rem] items-center gap-2 px-4 leading-tight md:gap-4">
         <Link href="/" className="flex flex-1 items-center gap-2">
           {!!METADATA.logo && (
-            <Image
-              src={METADATA.logo}
-              width={180}
-              height={36}
-              className="h-9 w-auto"
-              priority
-              alt={METADATA.name}
-            />
+            <>
+              <Image
+                src={METADATA.logo}
+                width={180}
+                height={36}
+                className="h-9 w-auto"
+                priority
+                alt={METADATA.name}
+              />
+              <h1 className="hidden font-pixel text-3xl uppercase text-background lg:block">
+                Build
+              </h1>
+            </>
           )}
           {!!METADATA.title && (
             <h1 className="font-serif text-sm leading-tight md:text-2xl">
@@ -30,13 +45,8 @@ export function Header() {
             </h1>
           )}
         </Link>
-        {isConnected && (
-          <Link href="/tickets" className="text-sm hover:underline">
-            Your Tickets
-          </Link>
-        )}
+
         <ConnectButton />
-        <ThemeToggle />
       </div>
     </header>
   );

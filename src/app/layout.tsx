@@ -1,4 +1,3 @@
-import { Header } from "@/components/Header";
 import { SupportedChainCheck } from "@/components/SupportedChainCheck";
 import { Toaster } from "@/components/ui/sonner";
 import { METADATA } from "@/config";
@@ -7,10 +6,11 @@ import { Providers } from "@/lib/providers";
 import { cn } from "@/lib/utils";
 import { wagmiConfig } from "@/lib/wagmi";
 import type { Metadata } from "next";
-import { ThemeProvider } from "next-themes";
 import { Inter } from "next/font/google";
 import { headers } from "next/headers";
 import { cookieToInitialState } from "wagmi";
+import "@fontsource-variable/pixelify-sans";
+import Layout from "@/components/Layout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,21 +34,18 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={cn(inter.className, "leading-7")}>
-        <ThemeProvider
+        {/* <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
-        >
-          <Providers initialState={initialState}>
-            <Header />
-            <main className="mx-auto w-full max-w-[48.875rem] px-4">
-              {children}
-            </main>
-            <Toaster />
-            <SupportedChainCheck />
-          </Providers>
-        </ThemeProvider>
+        > */}
+        <Providers initialState={initialState}>
+          <Layout>{children}</Layout>
+          <Toaster />
+          <SupportedChainCheck />
+        </Providers>
+        {/* </ThemeProvider> */}
       </body>
     </html>
   );

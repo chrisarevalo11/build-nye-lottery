@@ -17,14 +17,14 @@ export default function ConnectButton() {
 
   if (isConnected) {
     return (
-      <Button size="sm" onClick={() => open()} className="md:min-w-40">
+      <Button size="sm" onClick={() => open()}>
         {data ? data : formatAddress(address)}
       </Button>
     );
   }
   return (
-    <Button size="sm" onClick={() => open()} className="md:min-w-40">
-      Connect wallet
+    <Button size="sm" onClick={() => open()}>
+      Connect
     </Button>
   );
 }

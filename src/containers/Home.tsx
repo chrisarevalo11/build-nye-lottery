@@ -1,6 +1,6 @@
 "use client";
 
-import { Banner } from "@/components/Banner";
+import Hero from "@/components/Hero";
 import { Footer } from "@/components/Footer";
 import { LotteryStats, LotteryStatsSkeleton } from "@/components/LotteryStats";
 import { PreviousTickets } from "@/components/PreviousTickets";
@@ -26,7 +26,7 @@ export function Home() {
     return (
       <div className="mb-4 space-y-14">
         <div className="space-y-8">
-          <Banner />
+          <Hero />
           <LotteryInactive />
         </div>
       </div>
@@ -36,7 +36,7 @@ export function Home() {
   return (
     <div className="mb-4 space-y-14">
       <div className="space-y-8">
-        <Banner />
+        <Hero />
 
         {roundHasEnded && (
           <RoundEndAlert
