@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap px-3 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-80",
+  "flex-start group relative flex flex-col overflow-hidden px-3 py-1.5 text-sm font-medium ring-offset-background transition-all *:h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-80",
   {
     variants: {
       variant: {
@@ -19,8 +19,7 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-10 py-2",
-        sm: "h-9",
+        default: "h-fit",
         lg: "h-11",
         icon: "h-10 w-10",
       },
@@ -46,7 +45,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
-      />
+      >
+        <span className="overflow-hidden">
+          <span className="relative inset-0 inline-flex !min-h-full items-center justify-center whitespace-nowrap transition-all group-hover:-translate-y-[110%] group-hover:gap-2">
+            {props.children}
+          </span>
+          <span className="absolute bottom-[-100%] left-0 right-0 mx-auto inline-flex min-h-full items-center justify-center whitespace-nowrap transition-all group-hover:translate-y-[-100%] group-hover:gap-2">
+            {props.children}
+          </span>
+        </span>
+      </Comp>
     );
   },
 );

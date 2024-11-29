@@ -11,12 +11,8 @@ export const METADATA = {
   icon: `${APP_URL}/images/icon.svg`,
   logo: `/images/logo.svg`,
   bannerImage: "/images/banner.png",
-  longDescription: (
-    <p>
-      This is a test lottery to show how LottoPGF can be used to fund public
-      goods, community and other causes!
-    </p>
-  ),
+  longDescription:
+    "Celebrate BUILD becoming a public good with the BUILD NYE Lottery – a week of daily on-chain lotteries supporting global communities and rewarding Builders. Join the fun, win big, and make a difference this holiday season!",
 };
 
 // The chain where your lottery contract is deployed

@@ -6,7 +6,6 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createWeb3Modal } from "@web3modal/wagmi/react";
 import { useTheme } from "next-themes";
 import { useLayoutEffect, type ReactNode } from "react";

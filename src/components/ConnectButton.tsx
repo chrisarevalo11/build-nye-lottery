@@ -17,13 +17,13 @@ export default function ConnectButton() {
 
   if (isConnected) {
     return (
-      <Button size="sm" onClick={() => open()}>
+      <Button className="text-xs md:text-sm" onClick={() => open()}>
         {data ? data : formatAddress(address)}
       </Button>
     );
   }
   return (
-    <Button size="sm" onClick={() => open()}>
+    <Button className="text-xs md:text-sm" onClick={() => open()}>
       Connect
     </Button>
   );

@@ -33,7 +33,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn(inter.className, "leading-7")}>
+      <body className={cn(inter.className, "overflow-x-hidden leading-7")}>
         {/* <ThemeProvider
           attribute="class"
           defaultTheme="system"

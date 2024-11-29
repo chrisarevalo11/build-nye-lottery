@@ -2,28 +2,22 @@
 
 import ConnectButton from "@/components/ConnectButton";
 import { METADATA } from "@/config";
-import { useGSAP } from "@gsap/react";
+import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
 
 export default function Header() {
-  useGSAP(() => {
-    gsap.from(".header", {
-      y: "-200px",
-      duration: 1,
-      delay: 1.5,
-      ease: "power4.out",
-    });
-  }, []);
-
   return (
-    <header
-      className="header fixed left-0 right-0 z-50 mx-auto mt-4 w-[90%] max-w-[600px] border-4 border-black bg-white"
+    <motion.div
+      initial={{ y: "-100%" }}
+      animate={{ y: 0 }}
+      exit={{ y: "-100%" }}
+      className="fixed left-0 right-0 z-50 mx-auto mt-4 w-[90%] max-w-[600px] border-4 border-black bg-white"
       style={{ boxShadow: "8px 6px 0px #000" }}
     >
-      <div className="mx-auto flex h-14 w-full max-w-[48.875rem] items-center gap-2 px-4 leading-tight md:gap-4">
-        <Link href="/" className="flex flex-1 items-center gap-2">
+      <div className="mx-auto flex items-center justify-between gap-2 p-2 leading-tight md:gap-4">
+        <Link href="/" className="flex items-center gap-2">
           {!!METADATA.logo && (
             <>
               <Image
@@ -46,8 +40,12 @@ export default function Header() {
           )}
         </Link>
 
+        <button className="font-pixel font-semibold text-background">
+          Menu
+        </button>
+
         <ConnectButton />
       </div>
-    </header>
+    </motion.div>
   );
 }
