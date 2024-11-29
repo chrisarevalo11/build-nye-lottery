@@ -5,12 +5,24 @@ export default function nextConfig(phase) {
 
   /** @type {import('next').NextConfig} */
   const nextConfig = {
-    webpack: isBuild
-      ? (config) => {
-          config.externals.push("pino-pretty", "lokijs", "encoding");
-          return config;
-        }
-      : undefined,
+    webpack: (config) => {
+      if (isBuild) {
+        config.externals.push("pino-pretty", "lokijs", "encoding");
+      }
+
+      config.module.rules.push(
+        {
+          test: /\.d\.ts$/,
+          use: "ignore-loader",
+        },
+        {
+          test: /\.d\.ts\.map$/,
+          use: "ignore-loader",
+        },
+      );
+
+      return config;
+    },
   };
 
   return nextConfig;
