@@ -19,6 +19,10 @@ export default function nextConfig(phase) {
           test: /\.d\.ts\.map$/,
           use: "ignore-loader",
         },
+        {
+          test: /\.js\.map$/,
+          use: "ignore-loader",
+        },
       );
 
       return config;
