@@ -71,7 +71,7 @@ export default function Hero() {
           <Button
             variant={"white"}
             className="font-pixel text-2xl"
-            onClick={() => router.push("/tickets")}
+            onClick={() => router.push("/play")}
           >
             <PixelDiamond className="size-4" />
             <span>Play</span>

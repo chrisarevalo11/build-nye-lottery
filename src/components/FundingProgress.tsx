@@ -15,7 +15,7 @@ export function FundingProgress({
   return (
     <div className="flex items-center gap-2">
       <Progress className="h-3" value={parseInt(percentageRaised.toString())} />
-      <span className="text-sm tabular-nums text-foreground">
+      <span className="text-sm tabular-nums text-muted-foreground">
         {percentageRaised.toLocaleString("en-US", { maximumFractionDigits: 1 })}
         %
       </span>
