@@ -37,7 +37,6 @@ import { extractErrorMessages, handleTransactionError } from "@/lib/error";
 import { getRandomPicks } from "@/lib/random";
 import { cn } from "@/lib/utils";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
 import {
   CheckIcon,
   DicesIcon,
@@ -118,7 +117,6 @@ export type TicketPurchaseFields = InferOutput<
 
 export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
   // const client = usePublicClient();
-  const { open } = useWeb3Modal();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const addTicketRef = useRef<HTMLButtonElement>(null);
 

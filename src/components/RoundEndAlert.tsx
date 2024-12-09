@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { CHAIN, CONTRACT_ADDRESS } from "@/config";
 import { GameState } from "@/hooks/useCurrentGame";
 import { extractErrorMessages, handleTransactionError } from "@/lib/error";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { AlertTriangleIcon, Loader2Icon } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
@@ -30,7 +29,6 @@ export function RoundEndAlert({
   onGameFinalized?: () => void;
 }) {
   const client = usePublicClient();
-  const { open } = useWeb3Modal();
   const { isConnected } = useAccount();
 
   const {

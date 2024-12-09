@@ -1,11 +1,10 @@
 "use client";
 
-import ConnectButton from "@/components/ConnectButton";
 import { METADATA } from "@/config";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import gsap from "gsap";
+import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 
 export default function Header() {
   return (
@@ -40,11 +39,7 @@ export default function Header() {
           )}
         </Link>
 
-        <button className="font-pixel font-semibold text-background">
-          Menu
-        </button>
-
-        <ConnectButton />
+        <DynamicWidget />
       </div>
     </motion.div>
   );

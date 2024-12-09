@@ -11,7 +11,6 @@ import { NumbersList } from "@/components/WinningNumbers";
 import { useCurrentGame } from "@/hooks/useCurrentGame";
 import { useTicketClaimStatuses } from "@/hooks/useTicketClaimStatuses";
 import { useTickets } from "@/hooks/useTickets";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { AlertTriangleIcon, PartyPopperIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
@@ -20,7 +19,6 @@ import { useAccount } from "wagmi";
 
 export function Tickets({ gameId }: { gameId: bigint }) {
   const { gameId: currentGameId } = useCurrentGame();
-  const { open } = useWeb3Modal();
   const { address } = useAccount();
   const { tickets, hasWon, refetch } = useTicketsWithClaimStatus({
     address,

@@ -5,25 +5,15 @@ export default function nextConfig(phase) {
 
   /** @type {import('next').NextConfig} */
   const nextConfig = {
-    webpack: (config) => {
-      if (isBuild) {
-        config.externals.push("pino-pretty", "lokijs", "encoding");
-      }
-
-      // config.module.rules.push(
-      //   {
-      //     test: /\.d\.ts$/,
-      //     use: "ignore-loader",
-      //   },
-      //   {
-      //     test: /\.d\.ts\.map$/,
-      //     use: "ignore-loader",
-      //   },
-      // );
-
-      return config;
-    },
+    experimental: {},
+    reactStrictMode: true,
   };
+
+  if (isBuild) {
+    nextConfig.compiler = {
+      removeConsole: true,
+    };
+  }
 
   return nextConfig;
 }

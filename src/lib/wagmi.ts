@@ -1,8 +1,7 @@
 import { CHAIN, METADATA } from "@/config";
 import { transport } from "@/lib/chain";
-import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 import { createClient } from "viem";
-import { mainnet } from "viem/chains";
+import { baseSepolia, mainnet, scrollSepolia } from "viem/chains";
 import { cookieStorage, createConfig, createStorage, http } from "wagmi";
 
 export const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID;
@@ -17,10 +16,8 @@ const metadata = {
 
 const chains = [CHAIN] as const;
 
-export const wagmiConfig = defaultWagmiConfig({
+export const wagmiConfig = createConfig({
   chains,
-  projectId,
-  metadata,
   ssr: true,
   transports: {
     [CHAIN.id]: transport,
@@ -28,14 +25,10 @@ export const wagmiConfig = defaultWagmiConfig({
   storage: createStorage({
     storage: cookieStorage,
   }),
-  auth: {
-    email: false,
-    socials: [],
-  },
 });
 
 export const ensConfig = createConfig({
-  chains: [mainnet],
+  chains: [scrollSepolia, baseSepolia],
   client({ chain }) {
     return createClient({ chain, transport: http() });
   },
