@@ -10,20 +10,16 @@ export default function nextConfig(phase) {
         config.externals.push("pino-pretty", "lokijs", "encoding");
       }
 
-      config.module.rules.push(
-        {
-          test: /\.d\.ts$/,
-          use: "ignore-loader",
-        },
-        {
-          test: /\.d\.ts\.map$/,
-          use: "ignore-loader",
-        },
-        {
-          test: /\.js\.map$/,
-          use: "ignore-loader",
-        },
-      );
+      // config.module.rules.push(
+      //   {
+      //     test: /\.d\.ts$/,
+      //     use: "ignore-loader",
+      //   },
+      //   {
+      //     test: /\.d\.ts\.map$/,
+      //     use: "ignore-loader",
+      //   },
+      // );
 
       return config;
     },

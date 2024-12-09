@@ -41,3 +41,6 @@ export const GRAPHQL_API =
 // It will show a progress bar inside of the "funds raised" card.
 // Set to null to disable the progress bar
 export const FUNDRAISE_TARGET: bigint | null = null;
+
+export const pickLength = 5;
+export const maxBallValue = 9;

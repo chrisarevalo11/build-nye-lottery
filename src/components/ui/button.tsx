@@ -13,7 +13,7 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-white bg-transparent text-white hover:opacity-90",
         white: "bg-white text-background hover:opacity-80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
@@ -46,11 +46,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         {...props}
       >
-        <span className="overflow-hidden">
-          <span className="relative inset-0 inline-flex !min-h-full items-center justify-center whitespace-nowrap transition-all group-hover:-translate-y-[110%] group-hover:gap-2">
+        <span className="grid w-full place-content-center overflow-hidden">
+          <span className="relative inset-0 inline-flex !min-h-full items-center justify-center gap-1 whitespace-nowrap transition-all group-hover:-translate-y-[200%]">
             {props.children}
           </span>
-          <span className="absolute bottom-[-100%] left-0 right-0 mx-auto inline-flex min-h-full items-center justify-center whitespace-nowrap transition-all group-hover:translate-y-[-100%] group-hover:gap-2">
+          <span className="absolute bottom-[-100%] left-0 right-0 mx-auto inline-flex min-h-full items-center justify-center gap-1 whitespace-nowrap transition-all group-hover:translate-y-[-100%]">
             {props.children}
           </span>
         </span>
