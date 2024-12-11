@@ -2,25 +2,33 @@
 
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useAccount, useDisconnect, useSwitchChain } from "wagmi";
+import { useAccount, useDisconnect } from "wagmi";
+import { Button } from "./ui/button";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { CHAIN } from "@/config";
 
 export function SupportedChainCheck() {
   const { chainId: connectedChainId, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
-  const { chains, switchChain } = useSwitchChain();
+  const { primaryWallet } = useDynamicContext();
 
-  const defaultChain = chains[0];
+  const switchNetwork = async (chainId: number) => {
+    if (primaryWallet?.connector.supportsNetworkSwitching()) {
+      await primaryWallet.switchNetwork(chainId);
+      console.log("Success! Network switched");
+    }
+  };
+
+  const defaultChain = CHAIN;
 
   const isConnectedToUnsupportedChain =
-    isConnected && !chains.some((chain) => chain.id === connectedChainId);
+    isConnected && CHAIN.id !== connectedChainId;
 
   return (
     <AlertDialog open={isConnectedToUnsupportedChain}>
@@ -34,14 +42,12 @@ export function SupportedChainCheck() {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => disconnect()}>
+          <Button variant="outlineWhite" onClick={() => disconnect()}>
             Disconnect
-          </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={() => switchChain({ chainId: defaultChain.id })}
-          >
+          </Button>
+          <Button variant={"white"} onClick={() => switchNetwork(CHAIN.id)}>
             Connect to {defaultChain.name}
-          </AlertDialogAction>
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

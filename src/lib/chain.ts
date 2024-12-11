@@ -3,30 +3,22 @@ import { CHAIN, CONTRACT_ADDRESS } from "@/config";
 import {
   createPublicClient,
   createWalletClient,
-  fallback,
   getContract,
   http,
   parseGwei,
-  webSocket,
   type GetContractReturnType,
 } from "viem";
-import { scroll } from "viem/chains";
 
-export const transport = fallback([
-  webSocket(process.env.NEXT_PUBLIC_RPC_WS),
-  webSocket(),
-  http(process.env.NEXT_PUBLIC_RPC_HTTP, { batch: true }),
-  http(undefined, { batch: true }),
-]);
+console.log(process.env.NEXT_PUBLIC_RPC_WS);
 
 export const publicClient = createPublicClient({
   chain: CHAIN,
-  transport,
+  transport: http(),
 });
 
 export const walletClient = createWalletClient({
   chain: CHAIN,
-  transport,
+  transport: http(),
 });
 
 export const lootery: GetContractReturnType<
@@ -48,7 +40,7 @@ export async function estimateFeesPerGas() {
   let { maxFeePerGas, maxPriorityFeePerGas } =
     await publicClient.estimateFeesPerGas();
 
-  if (publicClient.chain.id === scroll.id) {
+  if (publicClient.chain.id === CHAIN.id) {
     maxFeePerGas =
       maxFeePerGas < SCROLL_MINIMUM_MAX_FEE_PER_GAS
         ? SCROLL_MINIMUM_MAX_FEE_PER_GAS

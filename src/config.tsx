@@ -1,6 +1,6 @@
 import { APP_URL } from "@/lib/host";
 import { type Address } from "viem";
-import { scroll } from "viem/chains";
+import { scrollSepolia } from "viem/chains";
 
 // Project metadata
 export const METADATA = {
@@ -16,7 +16,7 @@ export const METADATA = {
 };
 
 // The chain where your lottery contract is deployed
-export const CHAIN = scroll;
+export const CHAIN = scrollSepolia;
 
 // The ticker of the prize token. Will be used when rendering prizes.
 export const PRIZE_TOKEN_TICKER = "ETH";
