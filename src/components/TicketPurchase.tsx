@@ -1,17 +1,13 @@
 "use client";
 
 import { LOOTERY_ABI } from "@/abi/Lootery";
-import { LOOTERY_ETH_ADAPTER_ABI } from "@/abi/LooteryETHAdapter";
 import { Amount } from "@/components/Amount";
 import { FundingProgress } from "@/components/FundingProgress";
 import { NumberPicker } from "@/components/NumberPicker";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -19,11 +15,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   CHAIN,
   CONTRACT_ADDRESS,
-  LOOTERY_ETH_ADAPTER_ADDRESS,
-  maxBallValue,
-  pickLength,
   PRIZE_TOKEN_DECIMALS,
-  PRIZE_TOKEN_IS_NATIVE,
   PRIZE_TOKEN_TICKER,
 } from "@/config";
 import { FUNDRAISERS } from "@/fundraisers";
@@ -44,8 +36,7 @@ import {
   PlusIcon,
   WalletMinimalIcon,
 } from "lucide-react";
-import Link from "next/link";
-import { useRef, type ReactNode } from "react";
+import { useRef, useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import {
@@ -72,14 +63,10 @@ import {
   type Address,
   type Hex,
 } from "viem";
-import {
-  useAccount,
-  usePublicClient,
-  useReadContract,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { usePublicClient } from "wagmi";
 import FundraiserCard from "./FundraiserCard";
+import { DynamicWidget, useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { isEthereumWallet } from "@dynamic-labs/ethereum";
 
 const makeFieldSchema = (numbersCount: number) =>
   object({
@@ -116,26 +103,29 @@ export type TicketPurchaseFields = InferOutput<
 >;
 
 export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
-  // const client = usePublicClient();
+  const client = usePublicClient();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const addTicketRef = useRef<HTMLButtonElement>(null);
 
-  // const { address, isConnected } = useAccount();
-  // const { gameId, gameState } = useCurrentGame();
-  // const { isActive, accruedCommunityFees } = useGameData({ gameId });
-  // const { pickLength, maxBallValue, ticketPrice, prizeToken } = useGameConfig();
-  // const { refetch: refetchTickets } = useTickets({ address, gameId });
+  const { primaryWallet } = useDynamicContext();
+  const { gameId, gameState } = useCurrentGame();
+  const { isActive, accruedCommunityFees } = useGameData({ gameId });
+  const { pickLength, maxBallValue, ticketPrice, prizeToken } = useGameConfig();
+  const { refetch: refetchTickets } = useTickets({
+    address: primaryWallet?.address as Address,
+    gameId,
+  });
 
-  // const {
-  //   balance,
-  //   allowance,
-  //   increaseAllowance,
-  //   refetch: refetchAllowance,
-  //   isPendingAllowance,
-  // } = useBalanceWithAllowance({
-  //   address,
-  //   token: prizeToken,
-  // });
+  const {
+    balance,
+    allowance,
+    increaseAllowance,
+    refetch: refetchAllowance,
+    isPendingAllowance,
+  } = useBalanceWithAllowance({
+    address: primaryWallet?.address as Address,
+    token: prizeToken,
+  });
 
   const {
     control,
@@ -148,93 +138,85 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
       tickets: [{ numbers: new Set() }],
       recipient: zeroAddress,
     },
-    resolver: valibotResolver(makeFieldSchema(1)),
+    resolver: valibotResolver(makeFieldSchema(pickLength)),
   });
   const { fields, append, remove } = useFieldArray({
     control,
     name: "tickets",
   });
 
-  // const { writeContractAsync, data: hash } = useWriteContract();
-
-  // const { isLoading: isConfirming } = useWaitForTransactionReceipt({
-  //   hash,
-  // });
+  const [isConfirming, setIsConfirming] = useState(false);
 
   const tickets = useWatch({ name: "tickets", control });
   const recipient = useWatch({ name: "recipient", control });
 
-  // const isLoading = isSubmitting || isConfirming || isPendingAllowance;
+  const isLoading = isSubmitting || isConfirming || isPendingAllowance;
 
-  // const totalPrice = ticketPrice * BigInt(tickets.length);
+  const totalPrice = ticketPrice * BigInt(tickets.length);
 
-  // const hasEnoughBalance = !!balance && balance >= totalPrice;
-  // const hasEnoughAllowance = !!allowance && allowance >= totalPrice;
+  const hasEnoughBalance = !!balance && balance >= totalPrice;
+  const hasEnoughAllowance = !!allowance && allowance >= totalPrice;
 
-  // function onPurchaseComplete() {
-  //   setTimeout(() => refetchTickets(), 2000);
-  //   refetchAllowance();
-  //   reset();
-  //   onPurchase?.();
-  // }
+  function onPurchaseComplete() {
+    setTimeout(() => refetchTickets(), 2000);
+    refetchAllowance();
+    reset();
+    onPurchase?.();
+  }
 
-  // async function onSubmit(fields: TicketPurchaseFields) {
-  //   if (!address || !fields.tickets.length) return;
+  async function onSubmit(fields: TicketPurchaseFields) {
+    if (!primaryWallet || !isEthereumWallet(primaryWallet)) return null;
+    if (!fields.tickets.length) return;
 
-  //   try {
-  //     let hash: Hex;
+    try {
+      let hash: Hex;
 
-  //     const picks = fields.tickets.map(({ numbers, recipient }) => ({
-  //       whomst: recipient ?? address,
-  //       pick: [...numbers].sort((a, b) => a - b),
-  //     }));
+      const picks = fields.tickets.map(({ numbers, recipient }) => ({
+        whomst: recipient ?? (primaryWallet.address as Address),
+        pick: [...numbers].sort((a, b) => a - b),
+      }));
 
-  //     if (PRIZE_TOKEN_IS_NATIVE) {
-  //       hash = await writeContractAsync({
-  //         chain: CHAIN,
-  //         type: "eip1559",
-  //         abi: LOOTERY_ETH_ADAPTER_ABI,
-  //         address: LOOTERY_ETH_ADAPTER_ADDRESS,
-  //         functionName: "purchase",
-  //         value: totalPrice,
-  //         args: [CONTRACT_ADDRESS, picks, fields.recipient],
-  //       });
-  //     } else {
-  //       if (!hasEnoughAllowance) return;
+      if (!hasEnoughAllowance) return;
 
-  //       hash = await writeContractAsync({
-  //         chain: CHAIN,
-  //         type: "eip1559",
-  //         abi: LOOTERY_ABI,
-  //         address: CONTRACT_ADDRESS,
-  //         functionName: "purchase",
-  //         args: [picks, fields.recipient],
-  //       });
-  //     }
+      const walletClient = await primaryWallet.getWalletClient();
+      setIsConfirming(true);
 
-  //     toast.promise(async () => client?.waitForTransactionReceipt({ hash }), {
-  //       loading: "Waiting for confirmation…",
-  //       action: {
-  //         label: "Explorer",
-  //         onClick(e) {
-  //           e.preventDefault();
-  //           window.open(
-  //             `${CHAIN.blockExplorers.default.url}/tx/${hash}`,
-  //             "_blank",
-  //           );
-  //         },
-  //       },
-  //       success: "Tickets have been purchased!",
-  //       error(error) {
-  //         const { message } = extractErrorMessages(error);
-  //         return message;
-  //       },
-  //       finally: onPurchaseComplete,
-  //     });
-  //   } catch (error) {
-  //     handleTransactionError(error);
-  //   }
-  // }
+      hash = await walletClient.writeContract({
+        chain: CHAIN,
+        type: "eip1559",
+        abi: LOOTERY_ABI,
+        address: CONTRACT_ADDRESS,
+        functionName: "purchase",
+        args: [picks, fields.recipient],
+      });
+
+      toast.promise(async () => client?.waitForTransactionReceipt({ hash }), {
+        loading: "Waiting for confirmation…",
+        action: {
+          label: "Explorer",
+          onClick(e) {
+            e.preventDefault();
+            window.open(
+              `${CHAIN.blockExplorers.default.url}/tx/${hash}`,
+              "_blank",
+            );
+          },
+        },
+        success: "Tickets have been purchased!",
+        error(error) {
+          const { message } = extractErrorMessages(error);
+          return message;
+        },
+        finally: () => {
+          setIsConfirming(false);
+          onPurchaseComplete();
+        },
+      });
+    } catch (error) {
+      setIsConfirming(false);
+      handleTransactionError(error);
+    }
+  }
 
   function scrollToLastItem() {
     setTimeout(() => {
@@ -259,25 +241,23 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
     );
   }
 
-  // if (gameState === GameState.DrawPending) {
-  //   return <p>Draw is pending</p>;
-  // }
+  if (gameState === GameState.DrawPending) {
+    return <p>Draw is pending</p>;
+  }
 
-  // if (!isActive) {
-  //   return <p>Game is not active.</p>;
-  // }
+  if (!isActive) {
+    return <p>Game is not active.</p>;
+  }
 
   return (
-    <form
-    // onSubmit={handleSubmit(onSubmit)}
-    >
+    <form onSubmit={handleSubmit(onSubmit)}>
       <fieldset
         className="min-w-0 space-y-14"
-        // disabled={!isActive || isLoading}
+        disabled={!isActive || isLoading}
       >
         <section id="cause" className="space-y-6">
           <header className="space-y-2">
-            <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0">
+            <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight first:mt-0 sm:text-3xl">
               Select a cause to fund
             </h2>
             <p className="text-muted">
@@ -300,8 +280,7 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
                     <p className="text-muted-foreground">
                       <span className="font-semibold text-card-foreground">
                         <Amount
-                          value={10n}
-                          // value={accruedCommunityFees}
+                          value={accruedCommunityFees}
                           decimals={PRIZE_TOKEN_DECIMALS}
                         />
                       </span>{" "}
@@ -350,7 +329,7 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
 
         <section id="numbers" className="space-y-4">
           <header className="space-y-2">
-            <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0">
+            <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight first:mt-0 sm:text-3xl">
               Pick your numbers
             </h2>
             <p className="text-muted">Make your picks.</p>
@@ -415,7 +394,93 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
           </div>
         </section>
 
-        <section id="purchase" className="space-y-6">
+        <section id="purchase" className="space-y-6 pb-10">
+          <header className="space-y-2">
+            <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight first:mt-0 sm:text-3xl">
+              Checkout
+            </h2>
+            <p className="text-muted">Buy your tickets and contribute.</p>
+          </header>
+          <div className="rounded-3xl px-4 py-3 text-sm text-foreground shadow-sm md:text-base">
+            {primaryWallet?.isAuthenticated ? (
+              <div className="flex items-center justify-between gap-6">
+                {hasEnoughBalance ? (
+                  <>
+                    <div>
+                      <p>
+                        Buying {tickets.length}{" "}
+                        {tickets.length === 1 ? "ticket" : "tickets"} for{" "}
+                        <Amount
+                          value={totalPrice}
+                          decimals={PRIZE_TOKEN_DECIMALS}
+                        />{" "}
+                        {PRIZE_TOKEN_TICKER}
+                      </p>
+                      <p className="text-sm text-muted">
+                        You have{" "}
+                        <Amount
+                          value={balance}
+                          decimals={PRIZE_TOKEN_DECIMALS}
+                        />{" "}
+                        {PRIZE_TOKEN_TICKER}
+                      </p>
+                    </div>
+
+                    {hasEnoughAllowance ? (
+                      <Button variant={"white"} disabled={!hasEnoughBalance}>
+                        {isLoading && (
+                          <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                        )}{" "}
+                        Buy {tickets.length}{" "}
+                        {tickets.length === 1 ? "ticket" : "tickets"}
+                      </Button>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="white"
+                        onClick={() =>
+                          increaseAllowance({ amount: totalPrice })
+                        }
+                        disabled={!totalPrice || !hasEnoughBalance}
+                      >
+                        {isPendingAllowance && (
+                          <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                        )}{" "}
+                        Allow spending {PRIZE_TOKEN_TICKER}
+                      </Button>
+                    )}
+                  </>
+                ) : (
+                  <div>
+                    <p>
+                      You do not have enough balance. You need{" "}
+                      <Amount
+                        value={totalPrice}
+                        decimals={PRIZE_TOKEN_DECIMALS}
+                      />{" "}
+                      {PRIZE_TOKEN_TICKER}.
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      You have{" "}
+                      <Amount
+                        value={balance!}
+                        decimals={PRIZE_TOKEN_DECIMALS}
+                      />{" "}
+                      {PRIZE_TOKEN_TICKER}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="mb-20 flex items-center justify-between gap-6">
+                <p>
+                  Connect wallet to purchase {tickets.length}{" "}
+                  {tickets.length === 1 ? "ticket" : "tickets"}.
+                </p>
+                <DynamicWidget />
+              </div>
+            )}
+          </div>
           {/* {!hasEnoughBalance && (
             <Alert>
               <WalletMinimalIcon className="size-4" />
@@ -436,91 +501,6 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
               </AlertDescription>
             </Alert>
           )} */}
-          <div className="rounded-3xl px-4 py-3 text-sm text-foreground shadow-sm md:text-base">
-            {/* {isConnected ? ( */}
-            <div className="flex items-center justify-between gap-6">
-              {/* {hasEnoughBalance ? ( */}
-              {/* <> */}
-              <div>
-                {/* <p>
-                        Buying {tickets.length}{" "}
-                        {tickets.length === 1 ? "ticket" : "tickets"} for{" "}
-                        <Amount
-                          value={totalPrice}
-                          decimals={PRIZE_TOKEN_DECIMALS}
-                        />{" "}
-                        {PRIZE_TOKEN_TICKER}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        You have{" "}
-                        <Amount
-                          value={balance}
-                          decimals={PRIZE_TOKEN_DECIMALS}
-                        />{" "}
-                        {PRIZE_TOKEN_TICKER}
-                      </p> */}
-              </div>
-
-              {/* {PRIZE_TOKEN_IS_NATIVE || hasEnoughAllowance ? (
-                      <Button disabled={!hasEnoughBalance}>
-                        {isLoading && (
-                          <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                        )}{" "}
-                        Buy {tickets.length}{" "}
-                        {tickets.length === 1 ? "ticket" : "tickets"}
-                      </Button>
-                    ) : (
-                      <Button
-                        type="button"
-                        onClick={() =>
-                          increaseAllowance({ amount: totalPrice })
-                        }
-                        disabled={!totalPrice || !hasEnoughBalance}
-                      >
-                        {isPendingAllowance && (
-                          <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                        )}{" "}
-                        Allow spending {PRIZE_TOKEN_TICKER}
-                      </Button> 
-              {/* )} */}
-              {/* </>
-                ) : (
-                  <div>
-                    <p>
-                      You do not have enough balance. You need{" "}
-                      <Amount
-                        value={totalPrice}
-                        decimals={PRIZE_TOKEN_DECIMALS}
-                      />{" "}
-                      {PRIZE_TOKEN_TICKER}.
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      You have{" "}
-                      <Amount value={balance} decimals={PRIZE_TOKEN_DECIMALS} />{" "}
-                      {PRIZE_TOKEN_TICKER}
-                    </p>
-                  </div>
-                )} */}
-              {/* </> */}
-            </div>
-            <header className="space-y-2">
-              <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0">
-                Checkout
-              </h2>
-              <p className="text-muted">Buy your tickets and contribute.</p>
-            </header>
-            {/* ) : ( */}
-            <div className="mb-20 flex items-center justify-between gap-6">
-              <p>
-                Connect wallet to purchase {tickets.length}{" "}
-                {tickets.length === 1 ? "ticket" : "tickets"}.
-              </p>
-              <Button type="button" variant={"white"} onClick={() => open()}>
-                Connect wallet
-              </Button>
-            </div>
-            {/* )} */}
-          </div>
         </section>
       </fieldset>
     </form>

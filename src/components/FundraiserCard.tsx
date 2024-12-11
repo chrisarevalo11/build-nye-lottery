@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { Address } from "viem";
+import { erc20Abi, type Address } from "viem";
 import {
   Card,
   CardContent,
@@ -14,6 +14,8 @@ import { FundingProgress } from "./FundingProgress";
 import { Button } from "./ui/button";
 import { CheckIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useGameConfig } from "@/hooks/useGameConfig";
+import { useReadContract } from "wagmi";
 
 export default function FundraiserCard({
   title,
@@ -30,13 +32,13 @@ export default function FundraiserCard({
   isActive: boolean;
   onClick: () => void;
 }) {
-  // const { prizeToken } = useGameConfig();
-  // const { data: balance } = useReadContract({
-  //   address: prizeToken,
-  //   abi: erc20Abi,
-  //   functionName: "balanceOf",
-  //   args: [address],
-  // });
+  const { prizeToken } = useGameConfig();
+  const { data: balance } = useReadContract({
+    address: prizeToken,
+    abi: erc20Abi,
+    functionName: "balanceOf",
+    args: [address],
+  });
 
   return (
     <Card className="sm:col-span-3">
@@ -60,7 +62,7 @@ export default function FundraiserCard({
         </div>
 
         {!!targetAmount && (
-          <FundingProgress amount={0n} target={targetAmount} />
+          <FundingProgress amount={balance ?? 0n} target={targetAmount} />
         )}
       </CardContent>
       <CardFooter>

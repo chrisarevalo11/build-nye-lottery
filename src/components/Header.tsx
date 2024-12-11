@@ -8,10 +8,6 @@ import { DynamicWidget, useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Button } from "./ui/button";
 
 export default function Header() {
-  const { setShowAuthFlow, primaryWallet } = useDynamicContext();
-
-  console.log(primaryWallet);
-
   return (
     <motion.div
       initial={{ y: "-100%" }}

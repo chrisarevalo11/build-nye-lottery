@@ -1,6 +1,9 @@
-import { CHAIN, CONTRACT_ADDRESS, PRIZE_TOKEN_IS_NATIVE } from "@/config";
+import { CHAIN, CONTRACT_ADDRESS } from "@/config";
 import { extractErrorMessages, handleTransactionError } from "@/lib/error";
+import { isEthereumWallet } from "@dynamic-labs/ethereum";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "sonner";
 import { erc20Abi, type Address } from "viem";
 import {
@@ -21,6 +24,10 @@ export function useBalanceWithAllowance({
   onAllowanceUpdated?: () => void;
 }) {
   const client = usePublicClient();
+  const { primaryWallet } = useDynamicContext();
+
+  const [hash, setHash] = useState<Address | undefined>();
+
   const { data: tokenBalanceData, refetch } = useReadContracts({
     allowFailure: false,
     contracts: [
@@ -37,21 +44,17 @@ export function useBalanceWithAllowance({
         args: [address!, CONTRACT_ADDRESS],
       },
     ],
-    query: { enabled: !PRIZE_TOKEN_IS_NATIVE && !!address },
   });
 
-  const { writeContractAsync } = useWriteContract();
-
-  const {
-    data: hash,
-    isPending,
-    mutateAsync: increaseAllowance,
-  } = useMutation({
+  const { isPending, mutateAsync: increaseAllowance } = useMutation({
     async mutationFn({ amount }: { amount: bigint }) {
+      if (!primaryWallet || !isEthereumWallet(primaryWallet)) return null;
       if (!address || !token) return;
 
+      const walletClient = await primaryWallet.getWalletClient();
+
       try {
-        const hash = await writeContractAsync({
+        const hash = await walletClient.writeContract({
           chain: CHAIN,
           type: "eip1559",
           abi: erc20Abi,
@@ -59,6 +62,8 @@ export function useBalanceWithAllowance({
           functionName: "approve",
           args: [CONTRACT_ADDRESS, amount],
         });
+
+        setHash(hash);
 
         toast.promise(async () => client?.waitForTransactionReceipt({ hash }), {
           loading: "Waiting for confirmation…",
@@ -90,18 +95,14 @@ export function useBalanceWithAllowance({
     },
   });
 
-  const { isFetching: isWaitingForConfirmation } = useWaitForTransactionReceipt(
-    {
+  const { isFetching: isWaitingForConfirmation, data } =
+    useWaitForTransactionReceipt({
       hash,
-    },
-  );
-
-  const { data: nativeBalanceData } = useBalance({ address });
+    });
 
   const [tokenBalance, allowance] = tokenBalanceData ?? [];
 
-  const balance =
-    (PRIZE_TOKEN_IS_NATIVE ? nativeBalanceData?.value : tokenBalance) ?? 0n;
+  const balance = tokenBalance ?? 0n;
 
   return {
     balance,

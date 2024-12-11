@@ -19,15 +19,14 @@ export const METADATA = {
 export const CHAIN = scrollSepolia;
 
 // The ticker of the prize token. Will be used when rendering prizes.
-export const PRIZE_TOKEN_TICKER = "ETH";
+export const PRIZE_TOKEN_TICKER = "TALENT";
 export const PRIZE_TOKEN_DECIMALS = 18;
 // If true the user will pay with native tokens via the ETH adapter,
 // otherwise they will pay with the ERC20 token directly
-export const PRIZE_TOKEN_IS_NATIVE = true;
 
 // The contract address of the lottery
 export const CONTRACT_ADDRESS: Address =
-  "0xD14E428C78C9dA280028C462aA3E5D2e3105497B";
+  "0x312f80D7c8fF0272d060033696B1d108eE7Ba676";
 
 // The address of the ETH adapter contract
 export const LOOTERY_ETH_ADAPTER_ADDRESS: Address =
@@ -35,12 +34,9 @@ export const LOOTERY_ETH_ADAPTER_ADDRESS: Address =
 
 // The URL of the GraphQL API to get ticket data
 export const GRAPHQL_API =
-  "https://zuzalotto-indexer-production.up.railway.app";
+  "https://api.studio.thegraph.com/query/77216/lotto/version/latest";
 
 // The amount of money you're trying to raise.
 // It will show a progress bar inside of the "funds raised" card.
 // Set to null to disable the progress bar
 export const FUNDRAISE_TARGET: bigint | null = null;
-
-export const pickLength = 5;
-export const maxBallValue = 9;
