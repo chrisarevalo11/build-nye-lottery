@@ -4,7 +4,8 @@ import { METADATA } from "@/config";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import { DynamicWidget, useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { Button } from "./ui/button";
 
 export default function Header() {
   return (

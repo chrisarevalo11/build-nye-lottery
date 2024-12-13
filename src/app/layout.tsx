@@ -14,12 +14,12 @@ import Layout from "@/components/Layout";
 
 const inter = Inter({ subsets: ["latin"] });
 
-/* export const metadata: Metadata = {
+export const metadata: Metadata = {
   title: METADATA.name,
   description: METADATA.description,
   icons: METADATA.icon,
   metadataBase: new URL(METADATA.url),
-}; */
+};
 
 export default async function RootLayout({
   children,

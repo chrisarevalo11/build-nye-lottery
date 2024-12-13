@@ -16,7 +16,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { maxBallValue, pickLength } from "@/config";
 import { useGameConfig } from "@/hooks/useGameConfig";
 import { getRandomPicks } from "@/lib/random";
 import { cn, isObjectEmpty } from "@/lib/utils";
@@ -43,7 +42,7 @@ export function NumberPicker({
   onRemove?: (index: number) => void;
 }) {
   const [recipientVisible, setRecipientVisible] = useState(false);
-  // const { pickLength, maxBallValue } = useGameConfig();
+  const { pickLength, maxBallValue } = useGameConfig();
 
   const { errors } = useFormState({ control, name });
 
@@ -74,7 +73,7 @@ export function NumberPicker({
               return (
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center justify-center gap-2">
-                    {[...Array(10)].map((_, index) => {
+                    {[...Array(maxBallValue)].map((_, index) => {
                       const checked = numbers.has(index + 1);
 
                       return (
