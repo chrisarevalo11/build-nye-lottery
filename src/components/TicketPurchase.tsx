@@ -482,7 +482,7 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
                       <>
                         <div>
                           <p className="text-center text-muted-foreground sm:text-left">
-                            You don't enough balance.
+                            You don&apos;t enough balance.
                           </p>
                           <p className="flex gap-1">
                             <span className="font-semibold">Needed:</span>
