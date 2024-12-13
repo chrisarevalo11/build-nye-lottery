@@ -7,6 +7,7 @@ import { NumberPicker } from "@/components/NumberPicker";
 import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -67,6 +68,9 @@ import { usePublicClient } from "wagmi";
 import FundraiserCard from "./FundraiserCard";
 import { DynamicWidget, useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { isEthereumWallet } from "@dynamic-labs/ethereum";
+import { motion } from "motion/react";
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import Link from "next/link";
 
 const makeFieldSchema = (numbersCount: number) =>
   object({
@@ -111,10 +115,10 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
   const { gameId, gameState } = useCurrentGame();
   const { isActive, accruedCommunityFees } = useGameData({ gameId });
   const { pickLength, maxBallValue, ticketPrice, prizeToken } = useGameConfig();
-  const { refetch: refetchTickets } = useTickets({
-    address: primaryWallet?.address as Address,
-    gameId,
-  });
+  // const { refetch: refetchTickets } = useTickets({
+  //   address: primaryWallet?.address as Address,
+  //   gameId,
+  // });
 
   const {
     balance,
@@ -131,7 +135,7 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
     control,
     handleSubmit,
     setValue,
-    formState: { isSubmitting },
+    formState: { isSubmitting, isValid },
     reset,
   } = useForm<TicketPurchaseFields>({
     defaultValues: {
@@ -158,7 +162,7 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
   const hasEnoughAllowance = !!allowance && allowance >= totalPrice;
 
   function onPurchaseComplete() {
-    setTimeout(() => refetchTickets(), 2000);
+    // setTimeout(() => refetchTickets(), 2000);
     refetchAllowance();
     reset();
     onPurchase?.();
@@ -401,106 +405,119 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
             </h2>
             <p className="text-muted">Buy your tickets and contribute.</p>
           </header>
-          <div className="rounded-3xl px-4 py-3 text-sm text-foreground shadow-sm md:text-base">
-            {primaryWallet?.isAuthenticated ? (
-              <div className="flex items-center justify-between gap-6">
-                {hasEnoughBalance ? (
-                  <>
-                    <div>
-                      <p>
-                        Buying {tickets.length}{" "}
-                        {tickets.length === 1 ? "ticket" : "tickets"} for{" "}
-                        <Amount
-                          value={totalPrice}
-                          decimals={PRIZE_TOKEN_DECIMALS}
-                        />{" "}
-                        {PRIZE_TOKEN_TICKER}
-                      </p>
-                      <p className="text-sm text-muted">
-                        You have{" "}
-                        <Amount
-                          value={balance}
-                          decimals={PRIZE_TOKEN_DECIMALS}
-                        />{" "}
-                        {PRIZE_TOKEN_TICKER}
-                      </p>
-                    </div>
-
-                    {hasEnoughAllowance ? (
-                      <Button variant={"white"} disabled={!hasEnoughBalance}>
-                        {isLoading && (
-                          <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                        )}{" "}
-                        Buy {tickets.length}{" "}
-                        {tickets.length === 1 ? "ticket" : "tickets"}
-                      </Button>
-                    ) : (
-                      <Button
-                        type="button"
-                        variant="white"
-                        onClick={() =>
-                          increaseAllowance({ amount: totalPrice })
-                        }
-                        disabled={!totalPrice || !hasEnoughBalance}
-                      >
-                        {isPendingAllowance && (
-                          <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                        )}{" "}
-                        Allow spending {PRIZE_TOKEN_TICKER}
-                      </Button>
-                    )}
-                  </>
-                ) : (
-                  <div>
+          {!isValid ? (
+            <p className="text-center text-muted">
+              Please complete your ticket selection to process your order.
+            </p>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle>Order summary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex w-full items-center justify-between gap-2 text-muted-foreground">
+                    <p className="">
+                      {tickets.length}{" "}
+                      {tickets.length === 1 ? "ticket" : "tickets"}
+                    </p>
+                    <div className="mt-2 h-1 grow border-b-2 border-dashed border-muted" />
                     <p>
-                      You do not have enough balance. You need{" "}
                       <Amount
                         value={totalPrice}
-                        decimals={PRIZE_TOKEN_DECIMALS}
-                      />{" "}
-                      {PRIZE_TOKEN_TICKER}.
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      You have{" "}
-                      <Amount
-                        value={balance!}
                         decimals={PRIZE_TOKEN_DECIMALS}
                       />{" "}
                       {PRIZE_TOKEN_TICKER}
                     </p>
                   </div>
-                )}
-              </div>
-            ) : (
-              <div className="mb-20 flex items-center justify-between gap-6">
-                <p>
-                  Connect wallet to purchase {tickets.length}{" "}
-                  {tickets.length === 1 ? "ticket" : "tickets"}.
-                </p>
-                <DynamicWidget />
-              </div>
-            )}
-          </div>
-          {/* {!hasEnoughBalance && (
-            <Alert>
-              <WalletMinimalIcon className="size-4" />
-              <AlertTitle>Need more {PRIZE_TOKEN_TICKER}?</AlertTitle>
-              <AlertDescription className="space-y-2">
-                <p>
-                  You can bridge funds from other chains to {CHAIN.name}. We
-                  recommend relay.
-                </p>
-                <Button asChild>
-                  <Link
-                    target="_blank"
-                    href={makeBridgeUrl(parseEther("0.01"))}
-                  >
-                    Bridge to {CHAIN.name} using relay
-                  </Link>
-                </Button>
-              </AlertDescription>
-            </Alert>
-          )} */}
+                  <div className="mt-5 flex justify-end gap-2 text-lg font-semibold">
+                    <p>Total: </p>
+                    <p>
+                      <Amount
+                        value={totalPrice}
+                        decimals={PRIZE_TOKEN_DECIMALS}
+                      />{" "}
+                      {PRIZE_TOKEN_TICKER}
+                    </p>
+                  </div>
+                  <div className="mt-5 flex flex-col items-center justify-between gap-2 sm:flex-row">
+                    {!primaryWallet?.isAuthenticated ? (
+                      <>
+                        <p className="text-muted-foreground">
+                          Connect wallet to purchase {tickets.length}{" "}
+                          {tickets.length === 1 ? "ticket" : "tickets"}.
+                        </p>
+                        <DynamicWidget />
+                      </>
+                    ) : hasEnoughBalance ? (
+                      <div className="flex w-full justify-end">
+                        {hasEnoughAllowance ? (
+                          <Button disabled={!hasEnoughBalance}>
+                            {isLoading && (
+                              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                            )}{" "}
+                            Buy {tickets.length}{" "}
+                            {tickets.length === 1 ? "ticket" : "tickets"}
+                          </Button>
+                        ) : (
+                          <Button
+                            type="button"
+                            onClick={() =>
+                              increaseAllowance({ amount: totalPrice })
+                            }
+                            disabled={!totalPrice || !hasEnoughBalance}
+                          >
+                            {isPendingAllowance && (
+                              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                            )}{" "}
+                            Allow spending {PRIZE_TOKEN_TICKER}
+                          </Button>
+                        )}
+                      </div>
+                    ) : (
+                      <>
+                        <div>
+                          <p className="text-center text-muted-foreground sm:text-left">
+                            You don't enough balance.
+                          </p>
+                          <p className="flex gap-1">
+                            <span className="font-semibold">Needed:</span>
+                            <Amount
+                              value={totalPrice}
+                              decimals={PRIZE_TOKEN_DECIMALS}
+                            />{" "}
+                            {PRIZE_TOKEN_TICKER}.
+                          </p>
+                          <p className="flex gap-1">
+                            <span className="font-semibold">Balance:</span>
+                            <Amount
+                              value={balance!}
+                              decimals={PRIZE_TOKEN_DECIMALS}
+                            />{" "}
+                            {PRIZE_TOKEN_TICKER}
+                          </p>
+                        </div>{" "}
+                        <div>
+                          <Button asChild>
+                            <Link
+                              target="_blank"
+                              href={makeBridgeUrl(BigInt(totalPrice))}
+                            >
+                              Swap {PRIZE_TOKEN_TICKER} using relay
+                            </Link>
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
         </section>
       </fieldset>
     </form>
