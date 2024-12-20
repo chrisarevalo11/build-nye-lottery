@@ -19,7 +19,7 @@ const config = {
     },
     extend: {
       fontFamily: {
-        pixel: ["Pixelify Sans Variable", "system-ui", "sans-serif"],
+        pixel: ["NeuePixel", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -27,6 +27,9 @@ const config = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        gray: {
+          DEFAULT: "#9B9B9B",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",

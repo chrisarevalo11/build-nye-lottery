@@ -69,8 +69,9 @@ import FundraiserCard from "./FundraiserCard";
 import { DynamicWidget, useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { isEthereumWallet } from "@dynamic-labs/ethereum";
 import { motion } from "motion/react";
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import Link from "next/link";
+import LotteryCountdown from "./LotteryCountdown";
+import Jackpot from "./Jackpot";
 
 const makeFieldSchema = (numbersCount: number) =>
   object({
@@ -259,19 +260,24 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
         className="min-w-0 space-y-14"
         disabled={!isActive || isLoading}
       >
+        <section className="flex items-center justify-around">
+          <LotteryCountdown />
+          <Jackpot />
+        </section>
+
         <section id="cause" className="space-y-6">
           <header className="space-y-2">
-            <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight first:mt-0 sm:text-3xl">
+            <h2 className="scroll-m-20 font-pixel text-2xl font-semibold first:mt-0 sm:text-3xl">
               Select a cause to fund
             </h2>
-            <p className="text-muted">
+            <p>
               Select a fundraiser you want to support or contribute to the
               collective Fund.
             </p>
           </header>
 
           <div className="grid gap-6 sm:grid-cols-6">
-            <Card className="sm:col-span-3">
+            <Card className="text-background sm:col-span-3">
               <CardHeader className="h-full">
                 <div className="items- flex h-full flex-col justify-between gap-6">
                   <div className="space-y-4">
@@ -281,8 +287,8 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
                         Managed by the lottery organizer
                       </CardDescription>
                     </div>
-                    <p className="text-muted-foreground">
-                      <span className="font-semibold text-card-foreground">
+                    <p>
+                      <span className="font-semibold">
                         <Amount
                           value={accruedCommunityFees}
                           decimals={PRIZE_TOKEN_DECIMALS}
@@ -333,10 +339,10 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
 
         <section id="numbers" className="space-y-4">
           <header className="space-y-2">
-            <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight first:mt-0 sm:text-3xl">
+            <h2 className="scroll-m-20 font-pixel text-2xl font-semibold first:mt-0 sm:text-3xl">
               Pick your numbers
             </h2>
-            <p className="text-muted">Make your picks.</p>
+            <p>Make your picks.</p>
           </header>
           <ScrollArea
             viewportRef={scrollAreaRef}
@@ -376,7 +382,7 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
             <ScrollBar orientation="horizontal" className="hidden" />
           </ScrollArea>
           <div className="space-y-2">
-            <p className="text-sm text-muted">Shortcuts</p>
+            <p className="text-sm">Shortcuts</p>
             <div className="flex flex-col gap-2 overflow-x-auto sm:flex-row">
               <Button
                 type="button"
@@ -400,13 +406,13 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
 
         <section id="purchase" className="space-y-6 pb-10">
           <header className="space-y-2">
-            <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight first:mt-0 sm:text-3xl">
+            <h2 className="scroll-m-20 font-pixel text-2xl font-semibold first:mt-0 sm:text-3xl">
               Checkout
             </h2>
-            <p className="text-muted">Buy your tickets and contribute.</p>
+            <p>Buy your tickets and contribute.</p>
           </header>
           {!isValid ? (
-            <p className="text-center text-muted">
+            <p className="text-center">
               Please complete your ticket selection to process your order.
             </p>
           ) : (
@@ -420,12 +426,12 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
                   <CardTitle>Order summary</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex w-full items-center justify-between gap-2 text-muted-foreground">
+                  <div className="flex w-full items-center justify-between gap-2">
                     <p className="">
                       {tickets.length}{" "}
                       {tickets.length === 1 ? "ticket" : "tickets"}
                     </p>
-                    <div className="mt-2 h-1 grow border-b-2 border-dashed border-muted" />
+                    <div className="mt-2 h-1 grow border-b-2 border-dashed border-background" />
                     <p>
                       <Amount
                         value={totalPrice}
@@ -447,7 +453,7 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
                   <div className="mt-5 flex flex-col items-center justify-between gap-2 sm:flex-row">
                     {!primaryWallet?.isAuthenticated ? (
                       <>
-                        <p className="text-muted-foreground">
+                        <p className="">
                           Connect wallet to purchase {tickets.length}{" "}
                           {tickets.length === 1 ? "ticket" : "tickets"}.
                         </p>

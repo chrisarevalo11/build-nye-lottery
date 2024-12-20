@@ -6,13 +6,11 @@ import { Providers } from "@/lib/providers";
 import { cn } from "@/lib/utils";
 import { wagmiConfig } from "@/lib/wagmi";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { GeistMono } from "geist/font/mono";
 import { headers } from "next/headers";
 import { cookieToInitialState } from "wagmi";
 import "@fontsource-variable/pixelify-sans";
 import Layout from "@/components/Layout";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: METADATA.name,
@@ -33,7 +31,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn(inter.className, "overflow-x-hidden leading-7")}>
+      <body className={cn(GeistMono.className, "overflow-x-hidden leading-7")}>
         {/* <ThemeProvider
           attribute="class"
           defaultTheme="system"

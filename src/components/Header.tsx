@@ -13,8 +13,7 @@ export default function Header() {
       initial={{ y: "-100%" }}
       animate={{ y: 0 }}
       exit={{ y: "-100%" }}
-      className="fixed left-0 right-0 z-50 mx-auto mt-4 w-[90%] max-w-[600px] border-4 border-black bg-white"
-      style={{ boxShadow: "8px 6px 0px #000" }}
+      className="fixed left-0 right-0 z-50 mx-auto mt-4 w-[90%] max-w-[600px]"
     >
       <div className="mx-auto flex items-center justify-between gap-2 p-2 leading-tight md:gap-4">
         <Link href="/" className="flex items-center gap-2">
@@ -28,7 +27,7 @@ export default function Header() {
                 priority
                 alt={METADATA.name}
               />
-              <h1 className="hidden font-pixel text-3xl uppercase text-background lg:block">
+              <h1 className="hidden font-pixel text-3xl font-bold uppercase lg:block">
                 Build
               </h1>
             </>
