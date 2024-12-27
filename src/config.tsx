@@ -26,7 +26,7 @@ export const PRIZE_TOKEN_DECIMALS = 18;
 
 // The contract address of the lottery
 export const CONTRACT_ADDRESS: Address =
-  "0xB988f2893B05d112dd8008bCE2D1a019DFDd3769";
+  "0x8d376834ce8e369a4791bae52da96c941391574c";
 
 // The address of the ETH adapter contract
 export const LOOTERY_ETH_ADAPTER_ADDRESS: Address =
