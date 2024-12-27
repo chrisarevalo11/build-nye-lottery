@@ -321,7 +321,7 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
                 </div>
               </CardHeader>
             </Card>
-            {FUNDRAISERS.map((fundraiser, i) => {
+            {/* {FUNDRAISERS.map((fundraiser, i) => {
               return (
                 <FundraiserCard
                   key={i}
@@ -333,7 +333,7 @@ export function TicketPurchase({ onPurchase }: { onPurchase?: () => void }) {
                   onClick={() => setValue("recipient", fundraiser.address)}
                 />
               );
-            })}
+            })} */}
           </div>
         </section>
 
