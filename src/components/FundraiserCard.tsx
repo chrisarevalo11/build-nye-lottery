@@ -47,8 +47,8 @@ export default function FundraiserCard({
         {!!description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
       <CardContent>
-        <div className="text-muted-foreground">
-          <span className="font-semibold text-card-foreground">
+        <div className="">
+          <span className="font-semibold">
             <Amount value={0n} decimals={PRIZE_TOKEN_DECIMALS} />
           </span>{" "}
           {!!targetAmount ? (

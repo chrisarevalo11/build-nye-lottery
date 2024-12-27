@@ -41,7 +41,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-gray bg-background;
   }
 }
 
@@ -52,4 +52,11 @@
 
 .overscroll::-webkit-scrollbar {
   display: none; /* Hide scrollbar for Chrome, Safari, and Edge */
+}
+
+@font-face {
+  font-family: "NeuePixel";
+  src: url("/fonts/NeuePixelSans.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
 }
